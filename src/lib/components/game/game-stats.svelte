@@ -12,19 +12,19 @@
 	} = $props();
 
 	const stats = $derived([
-		{ label: 'Attempts', value: attempts.toString() },
+		{ label: 'Спроби', value: attempts.toString() },
 		{
-			label: 'Closest guess',
-			value: closestDistance === null ? '—' : `${closestDistance} borders`
+			label: 'Найближча спроба',
+			value: closestDistance === null ? '—' : `${closestDistance} кордонів`
 		},
-		{ label: 'Elapsed time', value: elapsedTime }
+		{ label: 'Час гри', value: elapsedTime }
 	]);
 </script>
 
 <Card.Root size="sm">
 	<Card.Header>
-		<Card.Title>Game stats</Card.Title>
-		<Card.Description>Updated as you make guesses.</Card.Description>
+		<Card.Title>Статистика гри</Card.Title>
+		<Card.Description>Оновлюється після кожної спроби.</Card.Description>
 	</Card.Header>
 	<Card.Content>
 		<dl class="divide-y">

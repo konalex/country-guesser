@@ -6,9 +6,12 @@
 </script>
 
 <svelte:head>
-	<title>Country Guesser</title>
+	<title>Вгадай країну</title>
 
-	<meta name="description" content="A geography game where distance is measured by land borders." />
+	<meta
+		name="description"
+		content="Гра з географії, де відстань вимірюється сухопутними кордонами."
+	/>
 
 	<link rel="icon" href={favicon} />
 </svelte:head>

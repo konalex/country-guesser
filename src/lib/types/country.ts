@@ -8,7 +8,10 @@
 export interface Country {
 	code: string;
 	name: string;
+	searchNames?: string[];
 	borders: string[];
 	flag: string;
 	region: string;
+	area: number;
+	population: number;
 }

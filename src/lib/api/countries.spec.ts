@@ -5,18 +5,23 @@ describe('normalizeCountry', () => {
 	it('maps the REST Countries response to the internal country model', () => {
 		expect(
 			normalizeCountry({
-				codes: { alpha_3: 'CZE' },
+				codes: { alpha_2: 'CZ', alpha_3: 'CZE' },
 				names: { common: 'Czechia' },
 				flag: { emoji: '🇨🇿' },
 				region: 'Europe',
-				borders: ['AUT', 'DEU', 'POL', 'SVK']
+				borders: ['AUT', 'DEU', 'POL', 'SVK'],
+				area: { kilometers: 78_866 },
+				population: 10_900_000
 			})
 		).toEqual({
 			code: 'CZE',
-			name: 'Czechia',
+			name: 'Чехія',
+			searchNames: ['Czechia'],
 			flag: '🇨🇿',
-			region: 'Europe',
-			borders: ['AUT', 'DEU', 'POL', 'SVK']
+			region: 'Європа',
+			borders: ['AUT', 'DEU', 'POL', 'SVK'],
+			area: 78_866,
+			population: 10_900_000
 		});
 	});
 
@@ -26,9 +31,29 @@ describe('normalizeCountry', () => {
 				codes: { alpha_3: 'ISL' },
 				names: { common: 'Iceland' },
 				flag: { emoji: '🇮🇸' },
-				region: 'Europe'
+				region: 'Europe',
+				area: { kilometers: 103_000 },
+				population: 390_000
 			}).borders
 		).toEqual([]);
+	});
+
+	it('uses the Ukrainian name for display and keeps the English name for search', () => {
+		const country = normalizeCountry({
+			codes: { alpha_2: 'UA', alpha_3: 'UKR' },
+			names: { common: 'Ukraine' },
+			flag: { emoji: '🇺🇦' },
+			area: { kilometers: 603_628 },
+			population: 37_000_000
+		});
+
+		expect(country.name).toBe('Україна');
+		expect(country.searchNames).toEqual(['Ukraine']);
+		expect(
+			[country.name, ...(country.searchNames ?? [])].some((name) =>
+				name.toLocaleLowerCase().includes('кра')
+			)
+		).toBe(true);
 	});
 
 	it('rejects an incomplete country response', () => {
@@ -48,7 +73,9 @@ describe('normalizeCountry', () => {
 								{
 									codes: { alpha_3: 'CZE' },
 									names: { common: 'Czechia' },
-									flag: { emoji: '🇨🇿' }
+									flag: { emoji: '🇨🇿' },
+									area: { kilometers: 78_866 },
+									population: 10_900_000
 								},
 								{
 									names: { common: 'Not a playable country' }
@@ -67,7 +94,9 @@ describe('normalizeCountry', () => {
 								{
 									codes: { alpha_3: 'ALB' },
 									names: { common: 'Albania' },
-									flag: { emoji: '🇦🇱' }
+									flag: { emoji: '🇦🇱' },
+									area: { kilometers: 28_748 },
+									population: 2_800_000
 								}
 							],
 							meta: { more: false }

@@ -2,13 +2,24 @@ import type { Country } from '$lib/types/country';
 
 const REST_COUNTRIES_URL = 'https://api.restcountries.com/countries/v5';
 const PAGE_SIZE = 100;
-const COUNTRY_FIELDS = ['names.common', 'codes.alpha_3', 'flag.emoji', 'region', 'borders'];
+const ukrainianCountryNames = new Intl.DisplayNames('uk-UA', { type: 'region' });
+const COUNTRY_FIELDS = [
+	'names.common',
+	'codes.alpha_2',
+	'codes.alpha_3',
+	'flag.emoji',
+	'region',
+	'borders',
+	'area.kilometers',
+	'population'
+];
 
 type RestCountriesCountry = {
 	names?: {
 		common?: string;
 	};
 	codes?: {
+		alpha_2?: string;
 		alpha_3?: string;
 	};
 	flag?: {
@@ -16,6 +27,10 @@ type RestCountriesCountry = {
 	};
 	region?: string;
 	borders?: string[];
+	area?: {
+		kilometers?: number;
+	};
+	population?: number;
 };
 
 type RestCountriesPage = {
@@ -33,23 +48,54 @@ type RestCountriesError = {
 	}>;
 };
 
+type CompleteRestCountriesCountry = RestCountriesCountry & {
+	names: { common: string };
+	codes: { alpha_3: string };
+	flag: { emoji: string };
+	area: { kilometers: number };
+	population: number;
+};
+
 /** Converts the API's response shape into the application's country model. */
 export function normalizeCountry(rawCountry: RestCountriesCountry): Country {
-	const code = rawCountry.codes?.alpha_3;
-	const name = rawCountry.names?.common;
-	const flag = rawCountry.flag?.emoji;
-
-	if (!code || !name || !flag) {
+	if (!hasCountryDetails(rawCountry)) {
 		throw new Error('REST Countries returned a country without a code, name, or flag.');
 	}
 
+	const localizedName = getUkrainianCountryName(rawCountry.codes.alpha_2);
+
 	return {
-		code,
-		name,
+		code: rawCountry.codes.alpha_3,
+		name: localizedName ?? rawCountry.names.common,
+		searchNames: getSearchNames(rawCountry.names.common, localizedName),
 		borders: rawCountry.borders ?? [],
-		flag,
-		region: rawCountry.region ?? 'Unknown'
+		flag: rawCountry.flag.emoji,
+		region: translateRegion(rawCountry.region),
+		area: rawCountry.area.kilometers,
+		population: rawCountry.population
 	};
+}
+
+function getUkrainianCountryName(alpha2Code?: string): string | undefined {
+	return alpha2Code ? ukrainianCountryNames.of(alpha2Code) : undefined;
+}
+
+function getSearchNames(commonName: string, localizedName?: string): string[] {
+	return localizedName && localizedName !== commonName ? [commonName] : [];
+}
+
+function translateRegion(region?: string): string {
+	const translations: Record<string, string> = {
+		Africa: 'Африка',
+		Americas: 'Америка',
+		Antarctic: 'Антарктика',
+		Antarctica: 'Антарктика',
+		Asia: 'Азія',
+		Europe: 'Європа',
+		Oceania: 'Океанія'
+	};
+
+	return region ? (translations[region] ?? region) : 'Невідомо';
 }
 
 /**
@@ -92,19 +138,20 @@ export async function fetchCountries(
 		}
 
 		const page = (await response.json()) as RestCountriesPage;
-		countries.push(
-			...page.data.objects
-				.filter(
-					(country) =>
-						Boolean(country.codes?.alpha_3) &&
-						Boolean(country.names?.common) &&
-						Boolean(country.flag?.emoji)
-				)
-				.map(normalizeCountry)
-		);
+		countries.push(...page.data.objects.filter(hasCountryDetails).map(normalizeCountry));
 		hasMore = page.data.meta.more;
 		offset += PAGE_SIZE;
 	}
 
 	return countries.sort((first, second) => first.name.localeCompare(second.name));
+}
+
+function hasCountryDetails(country: RestCountriesCountry): country is CompleteRestCountriesCountry {
+	return Boolean(
+		country.codes?.alpha_3 &&
+		country.names?.common &&
+		country.flag?.emoji &&
+		typeof country.area?.kilometers === 'number' &&
+		typeof country.population === 'number'
+	);
 }

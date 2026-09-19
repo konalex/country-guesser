@@ -1,5 +1,16 @@
 <script lang="ts">
 	import { Badge } from '$lib/components/ui/badge';
+	import { Button } from '$lib/components/ui/button';
+
+	let {
+		countryCount,
+		disabled = false,
+		onNewGame
+	}: {
+		countryCount: number;
+		disabled?: boolean;
+		onNewGame: () => void;
+	} = $props();
 </script>
 
 <header class="flex flex-col gap-4 border-b py-5 sm:flex-row sm:items-center sm:justify-between">
@@ -11,10 +22,15 @@
 			🌍
 		</span>
 		<span>
-			<span class="block text-sm font-semibold tracking-tight">Country Guesser</span>
-			<span class="block text-xs text-muted-foreground">Find the shortest land-border route</span>
+			<span class="block text-sm font-semibold tracking-tight">Вгадай країну</span>
+			<span class="block text-xs text-muted-foreground">Знайдіть найкоротший шлях суходолом</span>
 		</span>
 	</div>
 
-	<Badge variant="secondary" class="h-6 px-2.5">Connected World</Badge>
+	<div class="flex flex-wrap items-center gap-2">
+		<Badge variant="secondary" class="h-6 w-60 justify-center px-2.5 whitespace-nowrap"
+			>{countryCount} країн у зв’язаному світі</Badge
+		>
+		<Button variant="outline" size="sm" onclick={onNewGame} {disabled}>Нова гра</Button>
+	</div>
 </header>

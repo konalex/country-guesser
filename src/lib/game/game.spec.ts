@@ -2,14 +2,14 @@ import { describe, expect, it } from 'vitest';
 import { createGame } from './game.svelte';
 import type { Country } from '$lib/types/country';
 
-const countries: Country[] = [
+const countries = [
 	{ code: 'PRT', name: 'Portugal', borders: ['ESP'], flag: '🇵🇹', region: 'Europe' },
 	{ code: 'ESP', name: 'Spain', borders: ['FRA'], flag: '🇪🇸', region: 'Europe' },
 	{ code: 'FRA', name: 'France', borders: ['DEU'], flag: '🇫🇷', region: 'Europe' },
 	{ code: 'DEU', name: 'Germany', borders: ['CZE'], flag: '🇩🇪', region: 'Europe' },
 	{ code: 'CZE', name: 'Czechia', borders: [], flag: '🇨🇿', region: 'Europe' },
 	{ code: 'ISL', name: 'Iceland', borders: [], flag: '🇮🇸', region: 'Europe' }
-];
+].map((country) => ({ ...country, area: 1, population: 1 })) satisfies Country[];
 
 describe('createGame', () => {
 	it('starts a Connected World game with a target from the largest component', () => {

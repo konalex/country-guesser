@@ -3,7 +3,7 @@ import { getBorderDistance, findShortestBorderPath } from './bfs';
 import { createCountryGraph, getConnectedComponents } from './graph';
 import type { Country } from '$lib/types/country';
 
-const countries: Country[] = [
+const countries = [
 	{ code: 'PRT', name: 'Portugal', borders: ['ESP'], flag: '🇵🇹', region: 'Europe' },
 	{ code: 'ESP', name: 'Spain', borders: ['FRA'], flag: '🇪🇸', region: 'Europe' },
 	{ code: 'FRA', name: 'France', borders: ['DEU'], flag: '🇫🇷', region: 'Europe' },
@@ -12,7 +12,7 @@ const countries: Country[] = [
 	{ code: 'POL', name: 'Poland', borders: ['UKR'], flag: '🇵🇱', region: 'Europe' },
 	{ code: 'UKR', name: 'Ukraine', borders: [], flag: '🇺🇦', region: 'Europe' },
 	{ code: 'ISL', name: 'Iceland', borders: [], flag: '🇮🇸', region: 'Europe' }
-];
+].map((country) => ({ ...country, area: 1, population: 1 })) satisfies Country[];
 
 const graph = createCountryGraph(countries);
 
