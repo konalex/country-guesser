@@ -26,6 +26,10 @@ yarn test     # unit tests
 yarn build    # production build
 ```
 
+## REST Countries API
+
+The app loads country data from REST Countries v5. Create an API key, copy `.env.example` to `.env`, and set `REST_COUNTRIES_API_KEY`. The key is only for server-side use and must not be prefixed with `PUBLIC_`.
+
 The UI is composed from local shadcn-svelte components. Add components through its CLI only when a feature needs them, then customize the copied Svelte source in `src/lib/components/ui` as needed.
 
 The next implementation step is the normalized country model and pure border-graph utilities, including BFS.

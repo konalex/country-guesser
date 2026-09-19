@@ -2,6 +2,7 @@
 	import { Badge } from '$lib/components/ui/badge';
 	import * as Card from '$lib/components/ui/card';
 	import { Separator } from '$lib/components/ui/separator';
+	import { cn } from '$lib/utils';
 
 	export type GuessView = {
 		code: string;
@@ -11,7 +12,13 @@
 		relation?: 'warmer' | 'colder' | 'same';
 	};
 
-	let { guesses }: { guesses: GuessView[] } = $props();
+	let {
+		guesses,
+		class: className
+	}: {
+		guesses: GuessView[];
+		class?: string;
+	} = $props();
 
 	const relationCopy = {
 		warmer: '↑ Warmer',
@@ -20,7 +27,7 @@
 	} as const;
 </script>
 
-<Card.Root>
+<Card.Root class={cn('min-h-0', className)}>
 	<Card.Header class="border-b">
 		<Card.Title>Guess history</Card.Title>
 		<Card.Description>Border distance is always the source of truth.</Card.Description>
@@ -29,7 +36,7 @@
 		</Card.Action>
 	</Card.Header>
 
-	<Card.Content>
+	<Card.Content class="min-h-0 flex-1 overflow-y-auto">
 		{#if guesses.length === 0}
 			<div
 				class="flex min-h-48 flex-col items-center justify-center rounded-lg border border-dashed p-6 text-center"
@@ -51,9 +58,13 @@
 						<span class="text-xl" aria-hidden="true">{guess.flag}</span>
 						<div class="min-w-0 flex-1">
 							<p class="truncate text-sm font-medium">{guess.name}</p>
-							<p class="text-xs text-muted-foreground">{guess.distance} borders away</p>
+							<p class="text-xs text-muted-foreground">
+								{guess.distance === 0 ? 'Correct' : `${guess.distance} borders away`}
+							</p>
 						</div>
-						{#if index > 0 && guess.relation}
+						{#if guess.distance === 0}
+							<Badge>🎯 Correct</Badge>
+						{:else if guess.relation}
 							<Badge variant="secondary">{relationCopy[guess.relation]}</Badge>
 						{/if}
 					</div>
